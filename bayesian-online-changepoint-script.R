@@ -10,8 +10,6 @@ hazard_fn <- function(lambda){
 predictive_prob_norm <- function(x_t, mu, sigma, sigma_n){
   # bayesian updating for normal distribution
   update_variance <- sigma^2 + sigma_n^2
-  
- # dnorm(x_t, mean = mu, sd = sqrt(pred_var))
   dnorm(x_t, mean = mu, sd = sqrt(update_variance))
 }
 
