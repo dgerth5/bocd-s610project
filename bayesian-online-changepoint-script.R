@@ -1,5 +1,4 @@
-### need to figure out how to replace sigma
-
+### unknown mean, fixed variance
 
 # step 1
 hazard_fn <- function(lambda){
