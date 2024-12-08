@@ -4,14 +4,18 @@ library(reshape2)
 source("bayesian-online-changepoint-script.R") #call in functions from script
 
 # Simulated Data
-set.seed(5)
-data1 <- c(rnorm(50))
+set.seed(135)
+data1 <- rnorm(100)
 data2 <- c(rnorm(50), rnorm(50, mean = 5, sd = 1))
 data3 <- c(rnorm(50), rnorm(50, mean = 2, sd = 1))
 
 plot_function <- function(data, title){
   
-  b <- bocd(data)
+  b <- bocd(data,
+            mu = 0,
+            sigma_0 = 1,
+            sigma = 1,
+            lambda = 100)
   
   max_length <- max(sapply(b$run_length_probs, length))
   
