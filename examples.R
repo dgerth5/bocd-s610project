@@ -1,6 +1,8 @@
 library(ggplot2)
 library(reshape2)
 
+source("bayesian-online-changepoint-script.R") #call in functions from script
+
 # Simulated Data
 set.seed(5)
 data1 <- c(rnorm(50))
