@@ -31,6 +31,7 @@ calc_evidence_fn <- function(growth_prob, cp_prob){
 # step 7
 run_length_dist <- function(growth_prob, cp_prob, evidence){
   update_rl_probs <- numeric(length(growth_prob) + 1) # need to add 1 to initialization to account for r = 0
+  
   update_rl_probs[2:length(update_rl_probs)] <- growth_prob / evidence # probability of r_t = i > 0 
   update_rl_probs[1] <- cp_prob / evidence # probability of r_t = 0
   update_rl_probs
