@@ -34,7 +34,7 @@ plot_function <- function(data, title){
     scale_fill_gradient(low = "white", high = "red") +
     labs(
       x = "Data",
-      y = "Pun Length",
+      y = "Run Length",
       title = title
     ) +
     theme_minimal()
