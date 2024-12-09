@@ -89,6 +89,16 @@ bocd <- function(data,
                  sigma_0 = 1,       # prior std dev of mean
                  sigma = 1,         # prior sigma
                  lambda = 100) {    # expected run length
+  
+  # check that data is numeric
+  if (!is.numeric(data)){
+    print("Data must be numeric")
+  }
+  
+  # check that there are no NA's in data
+  if (any(is.na(data))) {
+    print("Remove NA's")
+  }
 
   # set up data
   n <- length(data)

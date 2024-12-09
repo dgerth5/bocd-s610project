@@ -3,6 +3,8 @@ library(reshape2)
 
 source("bayesian-online-changepoint-script.R") #call in functions from script
 
+#### check plots ####
+
 # Simulated Data
 set.seed(135)
 data1 <- rnorm(100)
@@ -44,3 +46,14 @@ plot_function <- function(data, title){
 plot_function(data1, "BOCD Test 1: No Changepoints")
 plot_function(data2, "BOCD Test 2: Distinct Changepoint")
 plot_function(data3, "BOCD Test 3: Unclear Changepoint")
+
+
+#### check to make sure data is numeric and has no NA's ####
+
+d1 <- 1:5
+d2 <- c(1:5,"d")
+d3 <- c(1:5, NA)
+
+b1 <- bocd(d1)
+b2 <- bocd(d2) # error as expected
+b3 <- bocd(d3) # error as expected
