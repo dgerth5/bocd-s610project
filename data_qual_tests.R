@@ -25,4 +25,3 @@ test_that("Should throw NA error",{
               info = "NA is data passed through")
   
 })
-

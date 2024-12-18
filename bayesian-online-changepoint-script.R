@@ -92,7 +92,7 @@ bocd <- function(data,
   
   # check that data is numeric
   if (!is.numeric(data)){
-    return("Data must be numeric")
+    print("Data must be numeric")
   }
   
   # check that there are no NA's in data
