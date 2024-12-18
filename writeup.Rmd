@@ -12,13 +12,11 @@ library(reshape2)
 library(testthat)
 ```
 
-Intro:
-
-
-
-Breaking down each function. 
-
-
+The algorithm I decided to program for this project is Bayesian Online Changepoint Detection. Published in 2007 by Ryan Prescott Adams and David JC MacKay, the algorithm detects when there have been abrupt shifts to the parameters of a time series, using Bayesian techniques. In this writeup, I will describe the algorithm in more detail, explain how I implemented the algorithm in R, and what tests I ran to make sure that my programming was correct.  
+To start, I wanted to give a bit more detail on the algorithm itself, and situations where it is useful. Say you are receiving new data each day about the temperature in the city you live in. This is time series data, being generated from some sort of distribution, but the parameters for summer are likely different than they are for fall or winter. Bayesian Online Changepoint detection aims to tell you when the underlying parameters of a time series distribution have shifted. In this case, it’s telling us when there has been a shift in seasons, and each season has a different set of parameters. Since this is an “online” algorithm, we are looking at the data as it comes in and adjusting the parameters, rather than retroactively looking back.  
+There are two things being estimated with this algorithm. The first are the set of parameters for the given distribution. For the normal distribution, that would be mu (the mean) and sigma (the standard distribution). The other thing that is being estimated is the run length distribution. The run length distribution is what describes whether or not there was a changepoint. Either the run length increases by 1 (which means there was no changepoint) or it goes back to 0 (there was a changepoint).  
+This algorithm can be used for any distribution that has a conjugate, but here I just look at the case of a Normal distribution with a known standard deviation, and an unknown mean. The mean is what we are looking at to see if there are any changepoints for a given time series.  
+My thoughts on implementing this algorithm were to break it down into basic steps, implement helper functions for each step, and then have one large function at the end that combines all of the steps and helper functions that were needed. On page 3 of the paper, the authors break down the algorithm into 9 basic steps, which gave me a basic outline of what to do. Aside from the step that reads the data, I created helper functions for each one of the steps, which you can see here below:  
 
 ```{r}
 # step 1
@@ -106,9 +104,25 @@ calculate_predictions <- function(means, vars, probs) {
 }
 ```
 
+This is just implementing what was listed in the box on page 3 of the paper, for the normal distribution. I implemented the appropriate formulas for each step, which is straightforward, but I'll give a one line explanation for each step.  
 
-Here is the final function.
+hazard_fn: This is the hazard function that takes in expected run length (lambda), and returns probability of changepoint at each step, which is constant and indicates memorylessness.  
 
+predictive_prob_norm: This calculates probability of new observation under the current distribution, using Bayesian formula for Normal distribution.  
+
+growth_prob: Calculates probability of run length increasing by 1.  
+
+cp_prob: Calculates probability of changepoint occuring.  
+
+calc_evidence_fn: Calculates total probability of observed data.  
+
+run_length_dist: Gets probability of each run length. Need to normalize using result of calc_evidence_fn.  
+
+update_stats: Follows Bayesian formula for updating parameters of Normal after seeing data, for each run length.  
+
+calculate_predictions: Computes predictive distribution.  
+
+Here is the final function:
 ```{r}
 bocd <- function(data,
                  mu_0 = 0,          # prior mean
@@ -186,9 +200,10 @@ bocd <- function(data,
 
 ```
 
-Tests
-
-To check that my code was correct, I first made plots for three cases where 
+For the testing phase, I made sure my code was implemented two different ways: graphically and numerically. Graphically, I wanted to run the algorithm for three separate cases, and plot the results to see if I was getting what I was expecting.  
+For the first case, I generated 100 random points from the standard normal distribution. I was expecting to see 0 changepoints, and the run length graph should be a straight line that looks like y = x.  
+For the second case, I generated 50 random points from the standard normal distribution, and 50 points from the normal distribution with mean 5 and standard deviation 1. In this case, I would expect to see a distinct changepoint at x = 51. Since the new mean is well outside the standard deviation of the standard normal distribution, this should be unexpected and shift the probability of a new change point to be near 1.  
+Lastly, I generated 50 random points from the standard normal distribution, and 50 points from the normal distribution with mean 2 and standard deviation 1. Unlike in the second case, the new mean is within what you could reasonably expect from the first distribution, and so at x = 51, we should see some probability mass at y = 0, indicating a new changepoint, and also some at y = 51, indicating that there isn’t a changepoint. Since the two distributions are close, we shouldn’t be too confident that there has been a change.  
 
 ```{r}
 set.seed(135)
@@ -234,7 +249,9 @@ plot_function(data3, "BOCD Test 3: Unclear Changepoint") + geom_vline(xintercept
 
 ```
 
-There were two things analytically I wanted to check. First, I wanted to make sure the means were being updated properly. To do so, I simulated 1 new data point, 0. The posterior mean with prior mean being 0, and data being 0, should be 0 as well. This test passed. I also wanted to make sure the run length probabilities summed to 1 in every case. I simulated 100 data points, and checked to make sure run length probabilites for each step summed to 1. This test passed as well.
+As you can see from the plots, the function generated what I expected.  
+
+There were two things numerically I wanted to check. First, I wanted to make sure the means were being updated properly. To do so, I simulated 1 new data point, 0. The posterior mean with prior mean being 0, and data being 0, should be 0 as well. This test passed. I also wanted to make sure the run length probabilities summed to 1 in every case. I simulated 100 data points, and checked to make sure run length probabilites for each step summed to 1. This test also passed.
 
 ```{r}
 test_that("Updated mean should be 0",{
@@ -292,4 +309,7 @@ test_that("Should throw NA error",{
 ```
 
 
-In conclusion, I have implemented the Bayesian Online Changepoint Detection algorithm in R, using a Gaussian distribution with unknown mean and known standard deviation. In the future, I would like to extend this work to use different distributions, as well as the Gaussian distribution with unknown mean and standard deviation. I tested to make sure the functions worked properly, and based on the analytic tests and the plots, the functions are working as expected.
+In conclusion, I have implemented the Bayesian Online Changepoint Detection algorithm in R, using a Gaussian distribution with unknown mean and known standard deviation. In the future, I would like to extend this work to use different distributions, as well as the Gaussian distribution with unknown mean and standard deviation. I tested to make sure the functions worked properly, and based on the analytic tests and the plots, the functions are working as expected.  
+
+GitHub repo: https://github.com/dgerth5/bocd-s610project
+Link to paper: https://arxiv.org/abs/0710.3742
