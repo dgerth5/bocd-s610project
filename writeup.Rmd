@@ -188,7 +188,7 @@ bocd <- function(data,
 
 Tests
 
-The first tests that I devised to check that the algorithm was working properly were visual tests. I wanted to look at three di
+To check that my code was correct, I first made plots for three cases where 
 
 ```{r}
 set.seed(135)
