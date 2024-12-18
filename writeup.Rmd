@@ -229,8 +229,8 @@ plot_function <- function(data, title){
 }
 
 plot_function(data1, "BOCD Test 1: No Changepoints")
-plot_function(data2, "BOCD Test 2: Distinct Changepoint")
-plot_function(data3, "BOCD Test 3: Unclear Changepoint")
+plot_function(data2, "BOCD Test 2: Distinct Changepoint") + geom_vline(xintercept = 51)
+plot_function(data3, "BOCD Test 3: Unclear Changepoint") + geom_vline(xintercept = 51)
 
 ```
 
